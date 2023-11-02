@@ -1,0 +1,15 @@
+body {
+    background-color: #333333; 
+    color: #ffffff; 
+    margin: 5%;
+}
+
+input, textarea  {
+    background-color: rgb(46, 46, 46); 
+    color: #ffffff; 
+}
+
+button {
+    background-color: rgb(0, 0, 0);
+    color: #ffffff 
+}
