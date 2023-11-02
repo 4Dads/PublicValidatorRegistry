@@ -7,9 +7,19 @@ body {
 input, textarea  {
     background-color: #000; 
     color: #ffffff; 
+    /*width: 100%;*/
 }
 
 button {
     background-color: #142663;
     color: #ffffff 
+}
+
+.input-section {
+    width: 50%;
+}
+
+input {
+    float: right;
+    width: 90%;
 }
