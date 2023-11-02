@@ -1,5 +1,8 @@
-const web3 = new Web3('https://coston-api.flare.network/ext/C/rpc');
-const contractAddress = '0x32580c46242F7C3D6AF86DdF10D82f2Af32cf558'; 
+const envPrefix = 'https://coston-api.flare.network';
+const explorerPrefix = 'https://coston-explorer.flare.network'
+const web3 = new Web3(envPrefix+'/ext/C/rpc');
+const contractAddress = '0x32580c46242F7C3D6AF86DdF10D82f2Af32cf558';
+const contractURL = explorerPrefix+'/address/'+contractAddress;
 
 const contractABI =[
     {
@@ -67,5 +70,9 @@ async function getAllProviderInformation() {
             console.error('Error Message:', error.message);
           }
     }
+}
+
+function openContract() {
+    return contractURL;
 }
 
