@@ -76,3 +76,34 @@ function openContract() {
     return contractURL;
 }
 
+async function sendFormattedJSON() {
+    try {
+        const formattedJSON = document.getElementById('minifiedOutput').value;
+        const transactionHash = await sendToChain(formattedJSON);
+        alert('Registered! Transaction Hash: ' + transactionHash);
+
+    } catch (error) {
+        console.error('Error sending transaction:', error);
+        alert('Failed to send transaction check console');
+    }
+}
+
+async function sendToChain(data) {
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const senderAddress = accounts[0];
+    const contractMethod = contract.methods.registerProviderInformation(data);
+
+    const transactionParameters = {
+        to: contractAddress,
+        from: senderAddress,
+        gas: '2000000',
+        data: contractMethod.encodeABI()
+    };
+
+    const transactionHash = await window.ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [transactionParameters],
+    });
+
+    return transactionHash;
+}
