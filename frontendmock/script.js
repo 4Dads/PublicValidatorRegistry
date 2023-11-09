@@ -1,7 +1,7 @@
 const envPrefix = 'https://coston-api.flare.network';
 const explorerPrefix = 'https://coston-explorer.flare.network'
 const web3 = new Web3(envPrefix+'/ext/C/rpc');
-const contractAddress = '0x77B2Dd3699E3aAF8c1748516768d02887be27306';
+const contractAddress = '0x17f3499f2b6994020a71c53317d987cFbE3Df48e';
 const contractURL = explorerPrefix+'/address/'+contractAddress;
 
 const contractABI = [
@@ -101,6 +101,9 @@ function stringToHex(str) {
 
 async function sendFormattedJSON() {
   try {
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const senderAddress = accounts[0];
+
     const address = document.getElementById('address').value;
     const name = document.getElementById('name').value;
     const nodeID = document.getElementById('nodeID').value;
@@ -110,18 +113,23 @@ async function sendFormattedJSON() {
     const data = {
       address: address,
       name: name,
-      nodeID: [nodeID],
+      nodeID: nodeID,
       url: url,
       logourl: logourl
     };
 
-    console.log(data);
+    const transactionParameters = {
+      to: contractAddress,
+      from: senderAddress,
+      gas: '1000000',
+      data: contract.methods.registerProviderInformation(JSON.stringify(data)).encodeABI()
+    };
 
-    const encodedData = encodeData(JSON.stringify(data).replace(/"/g,"'").replace('{','').replace('}','').replace(/\s/g, ""));
+    const transactionHash = await window.ethereum.request({
+      method: 'eth_sendTransaction',
+      params: [transactionParameters],
+    });
 
-    console.log(encodeData);
-
-    const transactionHash = await sendToChain(encodedData);
     alert('Registered! Transaction Hash: ' + transactionHash);
   } catch (error) {
     console.error('Error sending transaction:', error);
