@@ -1,25 +1,39 @@
 const envPrefix = 'https://coston-api.flare.network';
 const explorerPrefix = 'https://coston-explorer.flare.network'
 const web3 = new Web3(envPrefix+'/ext/C/rpc');
-const contractAddress = '0x32580c46242F7C3D6AF86DdF10D82f2Af32cf558';
+const contractAddress = '0x77B2Dd3699E3aAF8c1748516768d02887be27306';
 const contractURL = explorerPrefix+'/address/'+contractAddress;
 
-const contractABI =[
-    {
+const contractABI = [
+  {
       "constant": true,
       "inputs": [],
       "name": "getAllProviderInformation",
       "outputs": [
-        {
-          "name": "",
-          "type": "string[]"
-        }
+          {
+              "name": "",
+              "type": "string[]"
+          }
       ],
       "payable": false,
       "stateMutability": "view",
       "type": "function"
-    }
-  ];
+  },
+  {
+      "constant": false,
+      "inputs": [
+          {
+              "name": "_jsonProviderInformation",
+              "type": "string"
+          }
+      ],
+      "name": "registerProviderInformation",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+  }
+];
 
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
@@ -38,7 +52,7 @@ function minifyJSON() {
       logourl: logourl
     };
   
-    const jsonString = '\"'+JSON.stringify(data).replace(/\s/g, '').replace(/"/g, "'").replace('{','').replace('}','')+'\"';
+    const jsonString = '"'+JSON.stringify(data).replace(/\s/g, "").replace('{','').replace('}','').replace(/"/g,"'")+'"';
     document.getElementById('minifiedOutput').value = jsonString;
   }
   
@@ -56,54 +70,94 @@ function minifyJSON() {
       });
   }
 
-async function getAllProviderInformation() {
+  async function getAllProviderInformation() {
     try {
-        const result = await contract.methods.getAllProviderInformation().call();
-        const data = result;
-        //const nodes = result[1];
-
-        console.log('Return:', data);
-        //console.log('Nodes:', nodes);
+      const result = await contract.methods.getAllProviderInformation().call();
+      const data = result[0];
+      console.log(data);
+      //const utf8String = web3.utils.hexToUtf8(hexData);
+      //console.log(hexData);
+      const jsonString = JSON.parse(JSON.stringify(data));
+      console.log(jsonString);
+      alert(jsonString);
+      console.log('Return:', jsonString);
     } catch (error) {
-        //console.error('Error:', error);
-        if (error.message) {
-            console.error('Error Message:', error.message);
-          }
+      if (error.message) {
+        console.error('Error Message:', error.message);
+      }
     }
-}
+  }
 
 function openContract() {
     return contractURL;
 }
 
-async function sendFormattedJSON() {
-    try {
-        const formattedJSON = document.getElementById('minifiedOutput').value;
-        const transactionHash = await sendToChain(formattedJSON);
-        alert('Registered! Transaction Hash: ' + transactionHash);
-
-    } catch (error) {
-        console.error('Error sending transaction:', error);
-        alert('Failed to send transaction check console');
-    }
+function stringToHex(str) {
+  const hex = Array.from(new TextEncoder().encode(str))
+      .map(byte => byte.toString(16).padStart(2, '0'))
+      .join('');
+  return '0x' + hex;
 }
 
-async function sendToChain(data) {
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    const senderAddress = accounts[0];
-    const contractMethod = contract.methods.registerProviderInformation(data);
+async function sendFormattedJSON() {
+  try {
+    const address = document.getElementById('address').value;
+    const name = document.getElementById('name').value;
+    const nodeID = document.getElementById('nodeID').value;
+    const url = document.getElementById('url').value;
+    const logourl = document.getElementById('logourl').value;
 
-    const transactionParameters = {
-        to: contractAddress,
-        from: senderAddress,
-        gas: '2000000',
-        data: contractMethod.encodeABI()
+    const data = {
+      address: address,
+      name: name,
+      nodeID: [nodeID],
+      url: url,
+      logourl: logourl
     };
 
-    const transactionHash = await window.ethereum.request({
-        method: 'eth_sendTransaction',
-        params: [transactionParameters],
-    });
+    console.log(data);
 
-    return transactionHash;
+    const encodedData = encodeData(JSON.stringify(data).replace(/"/g,"'").replace('{','').replace('}','').replace(/\s/g, ""));
+
+    console.log(encodeData);
+
+    const transactionHash = await sendToChain(encodedData);
+    alert('Registered! Transaction Hash: ' + transactionHash);
+  } catch (error) {
+    console.error('Error sending transaction:', error);
+    alert('Failed to send transaction. Check console for details.');
+  }
+}
+
+
+
+async function sendToChain(data) {
+  const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+  const senderAddress = accounts[0];
+  const transactionParameters = {
+    to: contractAddress,
+    from: senderAddress,
+    gas: '1000000',
+    data: data
+  };
+
+  const transactionHash = await window.ethereum.request({
+    method: 'eth_sendTransaction',
+    params: [transactionParameters],
+  });
+
+  return transactionHash;
+}
+
+function hexToUtf8(hex) {
+  const utf8String = web3.utils.hexToUtf8(hex);
+  console.log(utf8String);
+  return JSON.parse(utf8String);
+}
+
+function encodeData(data) {
+  //data.nodeID = Array.isArray(data.nodeID) ? data.nodeID.filter(node => node !== "") : [];
+  const jsonStr = JSON.stringify(data);
+  const utf8Hex = web3.utils.utf8ToHex(jsonStr);
+  return utf8Hex;
 }
