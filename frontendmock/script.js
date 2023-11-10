@@ -72,24 +72,41 @@ function minifyJSON() {
 
   async function getAllProviderInformation() {
     try {
-      const result = await contract.methods.getAllProviderInformation().call();
-      const data = result[0];
-      //console.log(data);
-      //const utf8String = web3.utils.hexToUtf8(hexData);
-      //console.log(hexData);
-      const jsonString = JSON.parse(JSON.stringify(data));
-      //console.log(jsonString);
-      //alert(jsonString);
-      $('#modalSuccess').find('.modal-title').text('Data');
-      $('#modalSuccess').find('.modal-body').text(jsonString);
-      $('#modalSuccess').modal('show');
-      //console.log('Return:', jsonString);
+        let result = await contract.methods.getAllProviderInformation().call();
+        console.log(result);
+
+        result = result.map(item => JSON.parse(item, (key, value) => (typeof value === 'string' ? value.trim() : value)));
+
+        var tableBody = document.getElementById("table-body");
+        tableBody.innerHTML = ''; // Clear the table
+
+        result.forEach(function (data) {
+            var row = document.createElement("tr");
+
+            for (var key in data) {
+                var cell = document.createElement("td");
+                cell.textContent = data[key];
+                row.appendChild(cell);
+            }
+
+            tableBody.appendChild(row);
+        });
+
+        $('#modalSuccess').modal('show');
+        $('#modalSuccess').find('.modal-title').text('Data');
+
     } catch (error) {
-      if (error.message) {
-        console.error('Error Message:', error.message);
-      }
+
+
+        if (error.message) {
+            console.error('Error Message:', error.message);
+        }
+
+        $('#modalError').modal('show');
+        $('#modalError').find('.modal-title').text('Error');
+        $('#modalError').find('.modal-body').text('Error fetching data. Please try again.');
     }
-  }
+}
 
 function openContract() {
     return contractURL;

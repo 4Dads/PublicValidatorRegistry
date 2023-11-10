@@ -72,3 +72,7 @@ textarea {
 .btn, .modal-body {
     font-size: 12px;
 }
+
+table {
+    background-color: #000;
+}
