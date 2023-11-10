@@ -11,7 +11,7 @@ body {
     height: 100%;
 }
 
-.container {
+.container-fluid {
     display: flex;
     flex-direction: column;
     /* width: 100%; */
@@ -58,4 +58,17 @@ textarea {
 
 .buttonRow {
     padding-top: 10px;
+}
+
+.popover-header, .modal-header {
+    background-color: darkgreen;
+}
+
+.popover-body, .modal-body, .modal-footer {
+    background-color: #000;
+    color: #fff;
+}
+
+.btn, .modal-body {
+    font-size: 12px;
 }

@@ -74,13 +74,16 @@ function minifyJSON() {
     try {
       const result = await contract.methods.getAllProviderInformation().call();
       const data = result[0];
-      console.log(data);
+      //console.log(data);
       //const utf8String = web3.utils.hexToUtf8(hexData);
       //console.log(hexData);
       const jsonString = JSON.parse(JSON.stringify(data));
-      console.log(jsonString);
-      alert(jsonString);
-      console.log('Return:', jsonString);
+      //console.log(jsonString);
+      //alert(jsonString);
+      $('#modalSuccess').find('.modal-title').text('Data');
+      $('#modalSuccess').find('.modal-body').text(jsonString);
+      $('#modalSuccess').modal('show');
+      //console.log('Return:', jsonString);
     } catch (error) {
       if (error.message) {
         console.error('Error Message:', error.message);
@@ -130,7 +133,12 @@ async function sendFormattedJSON() {
       params: [transactionParameters],
     });
 
-    alert('Registered! Transaction Hash: ' + transactionHash);
+    //alert('Registered! Transaction Hash: ' + transactionHash);
+
+    $('#modalSuccess').find('.modal-title').text('Registered!')
+    $('#modalSuccess').find('.modal-body').text('Tx id: '+transactionHash)
+    $('#modalSuccess').modal('show');
+
   } catch (error) {
     console.error('Error sending transaction:', error);
     alert('Failed to send transaction. Check console for details.');
