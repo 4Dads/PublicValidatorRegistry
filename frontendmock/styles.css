@@ -60,11 +60,15 @@ textarea {
     padding-top: 10px;
 }
 
-.popover-header {
+.popover-header, .modal-header {
     background-color: darkgreen;
 }
 
-.popover-body {
+.popover-body, .modal-body, .modal-footer {
     background-color: #000;
     color: #fff;
+}
+
+.btn, .modal-body {
+    font-size: 12px;
 }

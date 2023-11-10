@@ -14,6 +14,26 @@
   <link rel="icon" href="https://4dads.io/wp-content/uploads/2021/11/cropped-cropped-4D_BlackSquareRounded_256-32x32.png" type="image/png"> <!-- update this depending on where hosted -->
   </head>
 <body>
+   <!-- modal -->
+<div class="modal fade" id="modalSuccess" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+        <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>-->
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
+        <button type="button" class="btn btn-primary" onclick="$('#modalSuccess').modal('hide')">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
   <script>
   //bootstrap
     $(document).ready(
@@ -25,7 +45,7 @@
     );
   </script>
   <div class="container-fluid">
-    <h1>FTSO Registry Tool</h1>
+    <h1 style="padding-top:2vw;">FTSO Registry Tool</h1>
     <h3>Placeholder Subtitle</h3>
     <br>
     <div class="input-section">
@@ -57,12 +77,12 @@
     <div class="output-section" style="width:100%;padding-top: 30px;align-items:center;">
       <h3 style="width: 60%">Step 2</h3>
       <label style="width: 60%" for="minifiedOutput" >Input:</label>
-      <textarea id="minifiedOutput" style="width:60%;height:300px" readonly></textarea>
+      <textarea id="minifiedOutput" style="width:60%;height:150px" readonly></textarea>
       <div class="buttonRow">
-        <button class="btn btn-primary" onclick="sendFormattedJSON()">Submit/Register</button>
-        <button class="btn btn-secondary" onclick="copyToClipboard()">Copy to Clipboard</button>
-        <button class="btn btn-secondary" onclick="window.open(openContract())">Open Contract</button>
-        <button class="btn btn-secondary" onclick="getAllProviderInformation()">Test Call</button>
+        <button class="btn btn-primary" onclick="sendFormattedJSON()" style="width: auto;">Submit/Register</button>
+        <button class="btn btn-secondary" onclick="copyToClipboard()" style="width: auto;">Copy to Clipboard</button>
+        <button class="btn btn-secondary" onclick="window.open(openContract())" style="width: auto;">Open Contract</button>
+        <button class="btn btn-secondary" onclick="getAllProviderInformation()" style="width: auto;">Test Call</button>
       </div>
     </div>
   </div>
