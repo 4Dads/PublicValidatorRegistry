@@ -11,7 +11,7 @@ body {
     height: 100%;
 }
 
-.container {
+.container-fluid {
     display: flex;
     flex-direction: column;
     /* width: 100%; */
@@ -58,4 +58,13 @@ textarea {
 
 .buttonRow {
     padding-top: 10px;
+}
+
+.popover-header {
+    background-color: darkgreen;
+}
+
+.popover-body {
+    background-color: #000;
+    color: #fff;
 }
