@@ -73,6 +73,6 @@ textarea {
     font-size: 12px;
 }
 
-table {
-    background-color: #000;
+.modal-lg, .modal-xl {
+    --bs-modal-width: 1200px;
 }

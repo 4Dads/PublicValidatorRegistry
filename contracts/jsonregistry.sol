@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >= 0.7.0 <0.9.0;
+pragma solidity >= 0.7.0 < 0.8.11;
 
-import "./IPriceSubmitter.sol";
+import "../ftso/userInterfaces/IPriceSubmitter.sol";
 
-contract FTSOandValidatorRegistry {
+contract ftso2ValidatorRegistry {
 
     address public owner;
     string[] private providerInformation;
-    uint256 public totalProvidersRegistered;
-    uint256 public totalModerators;
-    uint256 public voteThreshold;
+    uint256 private totalProvidersRegistered;
+    uint256 private totalModerators;
+    uint256 private voteThreshold;
     uint256 public stringLengthCap;
 
     //Contracts
@@ -29,17 +29,17 @@ contract FTSOandValidatorRegistry {
     string private constant ERR_INVALID_PROVIDER_ID = "Invalid Provider ID";
 
     //Mappings
-    mapping(address => uint) public providerID;
-    mapping(uint => address) public idProvider;
+    mapping(address => uint) private  providerID;
+    mapping(uint => address) private  idProvider;
     mapping(address => bool) private providerRegistered;
-    mapping(address => bool) public moderators;
-    mapping(address => bool) public blacklist;
-    mapping(address => mapping(address => bool)) public blacklistModeratorVotes;
-    mapping(address => mapping(address => bool)) public informationModeratorVotes;
-    mapping(address => uint) public numberBlacklistModeratorVotes;
-    mapping(address => uint) public numberInformationModeratorVotes;
+    mapping(address => bool) private moderators;
+    mapping(address => bool) private blacklist;
+    mapping(address => mapping(address => bool)) private blacklistModeratorVotes;
+    mapping(address => mapping(address => bool)) private informationModeratorVotes;
+    mapping(address => uint) private numberBlacklistModeratorVotes;
+    mapping(address => uint) private numberInformationModeratorVotes;
 
-    constructor(address _priceSubmitterAddress) {
+    constructor(address _priceSubmitterAddress){
         priceSubmitterContract = IPriceSubmitter(_priceSubmitterAddress);
         owner = msg.sender;
         totalModerators = 0;
@@ -58,7 +58,7 @@ contract FTSOandValidatorRegistry {
     }
 
     modifier isWhitelisted(){
-        require(priceSubmitterContract.voterWhitelistBitmap(msg.sender) > 0,ERR_ADDRESS_NOT_WHITELISTED);
+        require(priceSubmitterContract.voterWhitelistBitmap(msg.sender) > 0, ERR_ADDRESS_NOT_WHITELISTED);
         _;
     }
 
@@ -67,11 +67,16 @@ contract FTSOandValidatorRegistry {
         _;
     }
 
-    modifier differentVote(address _blacklistAddress,bool _vote){
+    modifier differentBlacklistVote(address _blacklistAddress,bool _vote){
         require (blacklistModeratorVotes[msg.sender][_blacklistAddress] != _vote, ERR_SAME_VOTE);
         _;
     }
 
+    modifier differentInformationVote(address _addressToDelete,bool _vote){
+        require (informationModeratorVotes[msg.sender][_addressToDelete] != _vote, ERR_SAME_VOTE);
+        _;
+    }
+    
     //Events
     event ProviderRegistered(address indexed owner);
     event ProviderDeleted(address indexed owner);
@@ -109,12 +114,14 @@ contract FTSOandValidatorRegistry {
         uint256 providerToDelete = providerID[msg.sender];
         uint256 lastIndex = totalProvidersRegistered;
 
-        providerInformation[providerToDelete- 1] = providerInformation[lastIndex - 1];
-        providerID[idProvider[lastIndex]] = providerID[msg.sender];
-        idProvider[providerID[msg.sender]] = idProvider[lastIndex];
+        if (providerToDelete != lastIndex - 1) {
+            providerInformation[providerToDelete] = providerInformation[lastIndex - 1];
+            providerID[idProvider[lastIndex - 1]] = providerID[msg.sender];
+            idProvider[providerID[msg.sender]] = idProvider[lastIndex - 1];
+        }
 
         providerInformation.pop();        
-        delete idProvider[lastIndex];
+        delete idProvider[lastIndex - 1];
         delete providerID[msg.sender];
         delete providerRegistered[msg.sender];
         totalProvidersRegistered--;
@@ -129,7 +136,7 @@ contract FTSOandValidatorRegistry {
     }
 
     // Blacklist address when votes pass 50% of total votes threshold, moderators can recall the function to change their vote
-    function blacklistAddress(address _blacklistAddress, bool _vote) external onlyModerator differentVote(_blacklistAddress,_vote){
+    function blacklistAddress(address _blacklistAddress, bool _vote) external onlyModerator differentBlacklistVote(_blacklistAddress,_vote){
         
         blacklistModeratorVotes[msg.sender][_blacklistAddress] = _vote;
         if (_vote){
@@ -150,7 +157,7 @@ contract FTSOandValidatorRegistry {
     }
 
     // Delete provider information when votes pass 50% of total votes threshold, moderators can recall the function to change their vote
-    function moderatorDeleteProviderInformation(address _addressToDelete, bool _vote) external onlyModerator differentVote(_addressToDelete,_vote){
+    function moderatorDeleteProviderInformation(address _addressToDelete, bool _vote) external onlyModerator differentInformationVote(_addressToDelete,_vote){
         
         require(providerRegistered[_addressToDelete],ERR_PROVIDER_NOT_REGISTERED);
         informationModeratorVotes[msg.sender][_addressToDelete] = _vote;
@@ -161,12 +168,14 @@ contract FTSOandValidatorRegistry {
                 uint256 providerToDelete = providerID[_addressToDelete];
                 uint256 lastIndex = totalProvidersRegistered;
 
-                providerInformation[providerToDelete- 1] = providerInformation[lastIndex - 1];
-                providerID[idProvider[lastIndex]] = providerID[_addressToDelete];
-                idProvider[providerID[_addressToDelete]] = idProvider[lastIndex];
+                if (providerToDelete != lastIndex - 1) {
+                    providerInformation[providerToDelete] = providerInformation[lastIndex - 1];
+                    providerID[idProvider[lastIndex - 1]] = providerID[_addressToDelete];
+                    idProvider[providerID[_addressToDelete]] = idProvider[lastIndex - 1];
+                }
 
                 providerInformation.pop();        
-                delete idProvider[lastIndex];
+                delete idProvider[lastIndex - 1];
                 delete providerID[_addressToDelete];
                 delete providerRegistered[_addressToDelete];
                 totalProvidersRegistered--;
@@ -192,24 +201,18 @@ contract FTSOandValidatorRegistry {
             assert(totalModerators > 0);
             --totalModerators;
         }
-        voteThreshold = totalModerators / 2;
+        voteThreshold = totalModerators / 2 + 1;
 
         emit ModeratorStatusChanged(_moderator,_status);
     }
-
     // Change owner
-    function transferOwnership(address _newOwner) external onlyOwner {
-        
+    function transferOwnership(address _newOwner) external onlyOwner{
         owner = _newOwner;
-
         emit OwnershipChanged(_newOwner);
     }
-
     // Change string length cap in case of further fields added
     function changeStringLengthCap(uint _newLength) external onlyOwner{
-        
         stringLengthCap = _newLength;
-
         emit StringLengthChanged(_newLength);
     }
 }
