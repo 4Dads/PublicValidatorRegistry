@@ -52,7 +52,7 @@ function minifyJSON() {
       logourl: logourl
     };
   
-    const jsonString = '"'+JSON.stringify(data).replace(/\s/g, "").replace('{','').replace('}','').replace(/"/g,"'")+'"';
+    const jsonString = '"'+JSON.stringify(data).replace(/\s/g, "").replace(/"/g,"'")+'"';
     document.getElementById('minifiedOutput').value = jsonString;
   }
   
