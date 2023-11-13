@@ -64,11 +64,11 @@ function minifyJSON() {
   
     navigator.clipboard.writeText(textToCopy)
       .then(() => {
-        alert('Minified JSON copied to clipboard!');
+        alert('Formatted Data copied to clipboard!');
       })
       .catch(err => {
         console.error('Failed to copy text: ', err);
-        alert('Failed to copy minified JSON. Please copy it manually.');
+        alert('Failed to copy Data. Please copy it manually.');
       });
   }
 

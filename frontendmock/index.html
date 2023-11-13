@@ -30,6 +30,17 @@
     styleElement.rel = 'stylesheet';
     styleElement.href = `styles.css?timestamp=${timestamp}`;
     document.head.appendChild(styleElement);
+
+    function isMobileDevice() {
+    return /Mobi|Android/i.test(navigator.userAgent);
+    }
+
+    if (isMobileDevice()) {
+      document.addEventListener('DOMContentLoaded', function () {
+        document.body.innerHTML = '<p>You really thought the guy that created this UI would create a mobile-friendly site? Use desktop.</p>';
+      });
+    }
+
   </script>
 
    <!-- modal -->
