@@ -1,7 +1,7 @@
 const envPrefix = 'https://coston-api.flare.network';
 const explorerPrefix = 'https://coston-explorer.flare.network'
 const web3 = new Web3(envPrefix+'/ext/C/rpc');
-const contractAddress = '0x17f3499f2b6994020a71c53317d987cFbE3Df48e';
+const contractAddress = '0x128dEf4FEBBF1b957244EA0dE10229F1762Bf905';
 const contractURL = explorerPrefix+'/address/'+contractAddress;
 
 const contractABI = [
