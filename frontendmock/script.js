@@ -87,7 +87,16 @@ function minifyJSON() {
 
             for (var key in data) {
                 var cell = document.createElement("td");
-                cell.textContent = data[key];
+                if (key === 'logourl') {
+                  var image = document.createElement("img");
+                  image.src = data[key];
+                  image.alt = 'Logo';
+                  image.style.maxWidth = '32px';
+                  image.style.maxHeight = '32px';
+                  cell.appendChild(image);
+              } else {
+                  cell.textContent = data[key];
+              }
                 row.appendChild(cell);
             }
 
