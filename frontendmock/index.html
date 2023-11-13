@@ -94,7 +94,7 @@
       <label style="width: 60%" for="minifiedOutput" >Input:</label>
       <textarea id="minifiedOutput" style="width:60%;height:150px" readonly></textarea>
       <div class="buttonRow">
-        <button class="btn btn-primary" onclick="sendFormattedJSON()" style="width: auto;">Submit/Register</button>
+        <button class="btn btn-primary" id="submitButton" onclick="sendFormattedJSON()" style="width: auto;">Submit/Register</button>
         <button class="btn btn-secondary" onclick="copyToClipboard()" style="width: auto;">Copy to Clipboard</button>
         <button class="btn btn-secondary" onclick="window.open(openContract())" style="width: auto;">Open Contract</button>
         <button class="btn btn-secondary" onclick="getAllProviderInformation()" style="width: auto;">Test Call</button>

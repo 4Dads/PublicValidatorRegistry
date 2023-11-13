@@ -54,6 +54,8 @@ function minifyJSON() {
   
     const jsonString = '"'+JSON.stringify(data).replace(/\s/g, "").replace(/"/g,"'")+'"';
     document.getElementById('minifiedOutput').value = jsonString;
+
+    updateSubmitButtonState();
   }
   
   function copyToClipboard() {
@@ -121,6 +123,14 @@ function stringToHex(str) {
 
 async function sendFormattedJSON() {
   try {
+    
+    const minifiedOutput = document.getElementById('minifiedOutput');
+
+    if (!isJSONValid(minifiedOutput.value)) {
+      alert('Invalid JSON. Please format the input correctly.');
+      return;
+    }
+
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     const senderAddress = accounts[0];
 
@@ -193,4 +203,26 @@ function encodeData(data) {
   const jsonStr = JSON.stringify(data);
   const utf8Hex = web3.utils.utf8ToHex(jsonStr);
   return utf8Hex;
+}
+
+function isJSONValid(jsonString) {
+  try {
+    JSON.parse(jsonString);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+function updateSubmitButtonState() {
+  const minifiedOutput = document.getElementById('minifiedOutput');
+  const submitButton = document.getElementById('submitButton');
+  
+  if (isJSONValid(minifiedOutput.value)) {
+    submitButton.disabled = false;
+    submitButton.classList.remove('btn-danger'); // Remove red color
+  } else {
+    submitButton.disabled = true;
+    submitButton.classList.add('btn-danger'); // Add red color
+  }
 }
