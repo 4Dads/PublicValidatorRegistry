@@ -40,14 +40,14 @@ const contract = new web3.eth.Contract(contractABI, contractAddress);
 function minifyJSON() {
     const address = document.getElementById('address').value.replace(/"/g,'&quot;').replace(/'/g,'&#39;');
     const name = encodeURIComponent(document.getElementById('name').value.replace(/"/g,'&quot;').replace(/'/g,'&#39;'));
-    const nodeID = document.getElementById('nodeID').value; //todo: verify byte20, length = 40
+    const nodeID = document.getElementById('nodeID').value.split(','); //todo: verify byte20, length = 40
     const url = encodeURIComponent(document.getElementById('url').value.replace(/"/g,'&quot;').replace(/'/g,'&#39;'));
     const logourl = encodeURIComponent(document.getElementById('logourl').value.replace(/"/g,'&quot;').replace(/'/g,'&#39;'));
   
     let data = {
       address: address,
       name: name,
-      nodeID: [nodeID], 
+      nodeID: nodeID, 
       url: url,
       logourl: logourl
     };
@@ -126,7 +126,7 @@ async function sendFormattedJSON() {
 
     const address = document.getElementById('address').value;
     const name = document.getElementById('name').value;
-    const nodeID = document.getElementById('nodeID').value;
+    const nodeID = document.getElementById('nodeID').value.split(',');
     const url = document.getElementById('url').value;
     const logourl = document.getElementById('logourl').value;
 
