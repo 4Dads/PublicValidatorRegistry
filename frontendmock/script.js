@@ -80,7 +80,7 @@ function minifyJSON() {
         result = result.map(item => JSON.parse(item, (key, value) => (typeof value === 'string' ? value.trim() : value)));
 
         var tableBody = document.getElementById("table-body");
-        tableBody.innerHTML = ''; // Clear the table
+        tableBody.innerHTML = ' '; // Clear the table
 
         result.forEach(function (data) {
             var row = document.createElement("tr");
