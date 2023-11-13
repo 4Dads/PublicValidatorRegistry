@@ -221,8 +221,10 @@ function updateSubmitButtonState() {
   if (isJSONValid(minifiedOutput.value)) {
     submitButton.disabled = false;
     submitButton.classList.remove('btn-danger'); // Remove red color
+    $('#submitButton')[0].innerText = 'Submit/Register'
   } else {
     submitButton.disabled = true;
     submitButton.classList.add('btn-danger'); // Add red color
+    $('#submitButton')[0].innerText = 'Invalid JSON';
   }
 }
