@@ -173,8 +173,8 @@ async function sendFormattedJSON() {
 
     await getAllProviderInformation();
 
-    $('#modalSuccess').find('.modal-title').text('Registered!' + ' | Tx id: '+transactionHash) //need to split these out later
-    //$('#modalSuccess').find('.modal-body').text('Tx id: '+transactionHash)
+    $('#modalSuccess').find('.modal-title').text('Registered!') //need to split these out later
+    $('#modalSuccess').find('.modal-body').prepend('Latest Tx id: '+transactionHash+'<br><br>')
     //$('#modalSuccess').modal('show');
 
   } catch (error) {
