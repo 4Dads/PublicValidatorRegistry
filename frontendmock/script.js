@@ -171,9 +171,11 @@ async function sendFormattedJSON() {
 
     //alert('Registered! Transaction Hash: ' + transactionHash);
 
-    $('#modalSuccess').find('.modal-title').text('Registered!')
-    $('#modalSuccess').find('.modal-body').text('Tx id: '+transactionHash)
-    $('#modalSuccess').modal('show');
+    await getAllProviderInformation();
+
+    $('#modalSuccess').find('.modal-title').text('Registered!' + ' | Tx id: '+transactionHash) //need to split these out later
+    //$('#modalSuccess').find('.modal-body').text('Tx id: '+transactionHash)
+    //$('#modalSuccess').modal('show');
 
   } catch (error) {
     console.error('Error sending transaction:', error);
