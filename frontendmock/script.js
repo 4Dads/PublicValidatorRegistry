@@ -90,6 +90,9 @@ function minifyJSON() {
                 if (key === 'logourl') {
                   var image = document.createElement("img");
                   image.src = data[key];
+                  if(data[key].substring(0,4) !== 'http') {
+                    image.src = '//'+data[key];
+                  }
                   image.alt = 'Logo';
                   image.style.maxWidth = '32px';
                   image.style.maxHeight = '32px';
