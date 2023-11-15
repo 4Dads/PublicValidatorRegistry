@@ -119,6 +119,51 @@ function stringToHex(str) {
   return '0x' + hex;
 }
 
+// https://web3js.readthedocs.io/en/v1.2.0/web3-utils.html?highlight=isValidAddress#isaddress
+function isValidAddress(address) {
+  try {
+    console.log("Validating Address: " + address);
+    let isAddress = web3.utils.isAddress(address);
+    if (!isAddress) {
+      return false;
+    }
+  } catch (e) {
+    console.log(e);
+    return false;
+  }
+  return true;
+}
+
+// Expect NodeID-ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567
+function isValidNodeId(address) {
+  console.log("Validating Node Id: " + address);
+
+    if (!address) { return false; }
+
+    let utf8Encode = new TextEncoder();    
+    let addressArray = address.split('-');
+
+    // Check if address is in correct format
+    if (addressArray.length != 2) {
+        return false;
+    }
+
+    // Check if prefix is NodeID
+    let nodePrefix = addressArray[0];
+    let nodeID = addressArray[1];
+
+    if (nodePrefix == 'NodeID') {
+        let encodedAddress = utf8Encode.encode(address);
+
+        // Check if address is 40 characters long
+        if (encodedAddress.length == 40) {
+            return true;
+        }
+        else { return false; }
+    }
+    else { return false; }
+}
+
 async function sendFormattedJSON() {
   try {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -129,6 +174,13 @@ async function sendFormattedJSON() {
     const nodeID = document.getElementById('nodeID').value;
     const url = document.getElementById('url').value;
     const logourl = document.getElementById('logourl').value;
+
+    if (!isValidAddress(address)) {
+      throw new Error('Invalid address');
+    }
+    if (!isValidNodeId(nodeID)) {
+      throw new Error('Invalid NodeID');
+    }
 
     const data = {
       address: address,
