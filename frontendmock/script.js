@@ -1,7 +1,7 @@
 const envPrefix = 'https://coston-api.flare.network';
 const explorerPrefix = 'https://coston-explorer.flare.network'
 const web3 = new Web3(envPrefix+'/ext/C/rpc');
-const contractAddress = '0x17f3499f2b6994020a71c53317d987cFbE3Df48e';
+const contractAddress = '0x128dEf4FEBBF1b957244EA0dE10229F1762Bf905';
 const contractURL = explorerPrefix+'/address/'+contractAddress;
 
 const contractABI = [
@@ -38,22 +38,24 @@ const contractABI = [
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
 function minifyJSON() {
-    const address = document.getElementById('address').value.replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    const address = encodeURIComponent(document.getElementById('address').value.replace(/"/g,'&quot;').replace(/'/g,'&#39;'));
     const name = encodeURIComponent(document.getElementById('name').value.replace(/"/g,'&quot;').replace(/'/g,'&#39;'));
-    const nodeID = document.getElementById('nodeID').value; //todo: verify byte20, length = 40
+    const nodeID = encodeURIComponent(document.getElementById('nodeID').value.split(',')); //todo: verify byte20, length = 40
     const url = encodeURIComponent(document.getElementById('url').value.replace(/"/g,'&quot;').replace(/'/g,'&#39;'));
     const logourl = encodeURIComponent(document.getElementById('logourl').value.replace(/"/g,'&quot;').replace(/'/g,'&#39;'));
   
     let data = {
       address: address,
       name: name,
-      nodeID: [nodeID], 
+      nodeID: nodeID, 
       url: url,
       logourl: logourl
     };
   
-    const jsonString = '"'+JSON.stringify(data).replace(/\s/g, "").replace('{','').replace('}','').replace(/"/g,"'")+'"';
+    const jsonString = '"'+JSON.stringify(data).replace(/\s/g, "").replace(/"/g,"'")+'"';
     document.getElementById('minifiedOutput').value = jsonString;
+
+    updateSubmitButtonState();
   }
   
   function copyToClipboard() {
@@ -62,11 +64,11 @@ function minifyJSON() {
   
     navigator.clipboard.writeText(textToCopy)
       .then(() => {
-        alert('Minified JSON copied to clipboard!');
+        alert('Formatted Data copied to clipboard!');
       })
       .catch(err => {
         console.error('Failed to copy text: ', err);
-        alert('Failed to copy minified JSON. Please copy it manually.');
+        alert('Failed to copy Data. Please copy it manually.');
       });
   }
 
@@ -78,14 +80,23 @@ function minifyJSON() {
         result = result.map(item => JSON.parse(item, (key, value) => (typeof value === 'string' ? value.trim() : value)));
 
         var tableBody = document.getElementById("table-body");
-        tableBody.innerHTML = ''; // Clear the table
+        tableBody.innerHTML = ' '; // Clear the table
 
         result.forEach(function (data) {
             var row = document.createElement("tr");
 
             for (var key in data) {
                 var cell = document.createElement("td");
-                cell.textContent = data[key];
+                if (key === 'logourl') {
+                  var image = document.createElement("img");
+                  image.src = data[key];
+                  image.alt = 'Logo';
+                  image.style.maxWidth = '32px';
+                  image.style.maxHeight = '32px';
+                  cell.appendChild(image);
+              } else {
+                  cell.textContent = data[key];
+              }
                 row.appendChild(cell);
             }
 
@@ -166,12 +177,20 @@ function isValidNodeId(address) {
 
 async function sendFormattedJSON() {
   try {
+    
+    const minifiedOutput = document.getElementById('minifiedOutput');
+
+    if (!isJSONValid(minifiedOutput.value)) {
+      alert('Invalid JSON. Please format the input correctly.');
+      return;
+    }
+
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     const senderAddress = accounts[0];
 
     const address = document.getElementById('address').value;
     const name = document.getElementById('name').value;
-    const nodeID = document.getElementById('nodeID').value;
+    const nodeID = document.getElementById('nodeID').value.split(',');
     const url = document.getElementById('url').value;
     const logourl = document.getElementById('logourl').value;
 
@@ -204,9 +223,11 @@ async function sendFormattedJSON() {
 
     //alert('Registered! Transaction Hash: ' + transactionHash);
 
-    $('#modalSuccess').find('.modal-title').text('Registered!')
-    $('#modalSuccess').find('.modal-body').text('Tx id: '+transactionHash)
-    $('#modalSuccess').modal('show');
+    await getAllProviderInformation();
+
+    $('#modalSuccess').find('.modal-title').text('Registered!') //need to split these out later
+    $('#modalSuccess').find('.modal-body').prepend('Latest Tx id: '+transactionHash+'<br><br>')
+    //$('#modalSuccess').modal('show');
 
   } catch (error) {
     console.error('Error sending transaction:', error);
@@ -245,4 +266,28 @@ function encodeData(data) {
   const jsonStr = JSON.stringify(data);
   const utf8Hex = web3.utils.utf8ToHex(jsonStr);
   return utf8Hex;
+}
+
+function isJSONValid(jsonString) {
+  try {
+    JSON.parse(jsonString);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+function updateSubmitButtonState() {
+  const minifiedOutput = document.getElementById('minifiedOutput');
+  const submitButton = document.getElementById('submitButton');
+  
+  if (isJSONValid(minifiedOutput.value)) {
+    submitButton.disabled = false;
+    submitButton.classList.remove('btn-danger'); // Remove red color
+    $('#submitButton')[0].innerText = 'Submit/Register'
+  } else {
+    submitButton.disabled = true;
+    submitButton.classList.add('btn-danger'); // Add red color
+    $('#submitButton')[0].innerText = 'Invalid JSON';
+  }
 }
