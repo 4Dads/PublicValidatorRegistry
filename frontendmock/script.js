@@ -40,7 +40,7 @@ const contract = new web3.eth.Contract(contractABI, contractAddress);
 function minifyJSON() {
     const address = encodeURIComponent(document.getElementById('address').value.replace(/"/g,'&quot;').replace(/'/g,'&#39;'));
     const name = encodeURIComponent(document.getElementById('name').value.replace(/"/g,'&quot;').replace(/'/g,'&#39;'));
-    const nodeID = encodeURIComponent(document.getElementById('nodeID').value.split(',')); //todo: verify byte20, length = 40
+    const nodeID = document.getElementById('nodeID').value.replace(/\s/g, "").split(','); //todo: verify byte20, length = 40
     const url = encodeURIComponent(document.getElementById('url').value.replace(/"/g,'&quot;').replace(/'/g,'&#39;'));
     const logourl = encodeURIComponent(document.getElementById('logourl').value.replace(/"/g,'&quot;').replace(/'/g,'&#39;'));
   
@@ -54,6 +54,17 @@ function minifyJSON() {
   
     const jsonString = '"'+JSON.stringify(data).replace(/\s/g, "").replace(/"/g,"'")+'"';
     document.getElementById('minifiedOutput').value = jsonString;
+
+    if (!isValidAddress(address)) {
+      throw new Error('Invalid address');
+    }
+    //console.log(nodeID);
+
+    for(var items in nodeID) {
+      if (!isValidNodeId(nodeID[items])) {
+        throw new Error('Invalid NodeID');
+      }
+    } 
 
     updateSubmitButtonState();
   }
@@ -126,11 +137,11 @@ function openContract() {
     return contractURL;
 }
 
-function stringToHex(str) {
-  const hex = Array.from(new TextEncoder().encode(str))
-      .map(byte => byte.toString(16).padStart(2, '0'))
-      .join('');
-  return '0x' + hex;
+function isValidBytes(str) {
+  const encoder = new TextEncoder();
+  const bytes = encoder.encode(str);
+  console.log(bytes.length);
+  return bytes.length === 40;
 }
 
 // https://web3js.readthedocs.io/en/v1.2.0/web3-utils.html?highlight=isValidAddress#isaddress
@@ -149,34 +160,21 @@ function isValidAddress(address) {
 }
 
 // Expect NodeID-ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567
-function isValidNodeId(address) {
-  console.log("Validating Node Id: " + address);
+function isValidNodeId(nodes) {
+  console.log("Validating Node Id: " + nodes);
 
-    if (!address) { return false; }
+    if (!nodes) { return false; }
 
-    let utf8Encode = new TextEncoder();    
-    let addressArray = address.split('-');
+    //console.log(isValidBytes(nodes));
 
-    // Check if address is in correct format
-    if (addressArray.length != 2) {
-        return false;
-    }
+     if(isValidBytes(nodes)) {
+      return true
+     };
+        
+    return false;
+  }
 
-    // Check if prefix is NodeID
-    let nodePrefix = addressArray[0];
-    let nodeID = addressArray[1];
 
-    if (nodePrefix == 'NodeID') {
-        let encodedAddress = utf8Encode.encode(address);
-
-        // Check if address is 40 characters long
-        if (encodedAddress.length == 40) {
-            return true;
-        }
-        else { return false; }
-    }
-    else { return false; }
-}
 
 async function sendFormattedJSON() {
   try {
@@ -196,13 +194,6 @@ async function sendFormattedJSON() {
     const nodeID = document.getElementById('nodeID').value.split(',');
     const url = document.getElementById('url').value;
     const logourl = document.getElementById('logourl').value;
-
-    if (!isValidAddress(address)) {
-      throw new Error('Invalid address');
-    }
-    if (!isValidNodeId(nodeID)) {
-      throw new Error('Invalid NodeID');
-    }
 
     const data = {
       address: address,
