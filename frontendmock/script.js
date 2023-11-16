@@ -40,9 +40,10 @@ const contract = new web3.eth.Contract(contractABI, contractAddress);
 function minifyJSON() {
     const address = encodeURIComponent(document.getElementById('address').value.replace(/"/g,'&quot;').replace(/'/g,'&#39;'));
     const name = encodeURIComponent(document.getElementById('name').value.replace(/"/g,'&quot;').replace(/'/g,'&#39;'));
-    const nodeID = encodeURIComponent(document.getElementById('nodeID').value.split(',')); //todo: verify byte20, length = 40
+    const nodeID = document.getElementById('nodeID').value.replace(/\s/g, "").split(','); //todo: verify byte20, length = 40
     const url = encodeURIComponent(document.getElementById('url').value.replace(/"/g,'&quot;').replace(/'/g,'&#39;'));
     const logourl = encodeURIComponent(document.getElementById('logourl').value.replace(/"/g,'&quot;').replace(/'/g,'&#39;'));
+    const submitButton = document.getElementById('submitButton');
   
     let data = {
       address: address,
@@ -54,6 +55,23 @@ function minifyJSON() {
   
     const jsonString = '"'+JSON.stringify(data).replace(/\s/g, "").replace(/"/g,"'")+'"';
     document.getElementById('minifiedOutput').value = jsonString;
+
+    if (!isValidAddress(address)) {
+      submitButton.disabled = true;
+      submitButton.classList.add('btn-danger');
+      $('#submitButton')[0].innerText = 'Invalid Address';
+      throw new Error('Invalid address');
+    }
+    //console.log(nodeID);
+
+    for(var items in nodeID) {
+      if (!isValidNodeId(nodeID[items])) {
+        submitButton.disabled = true;
+        submitButton.classList.add('btn-danger');
+        $('#submitButton')[0].innerText = 'Invalid NodeID';
+        throw new Error('Invalid NodeID');
+      }
+    } 
 
     updateSubmitButtonState();
   }
@@ -90,6 +108,9 @@ function minifyJSON() {
                 if (key === 'logourl') {
                   var image = document.createElement("img");
                   image.src = data[key];
+                  if(data[key].substring(0,4) !== 'http') {
+                    image.src = '//'+data[key];
+                  }
                   image.alt = 'Logo';
                   image.style.maxWidth = '32px';
                   image.style.maxHeight = '32px';
@@ -123,12 +144,44 @@ function openContract() {
     return contractURL;
 }
 
-function stringToHex(str) {
-  const hex = Array.from(new TextEncoder().encode(str))
-      .map(byte => byte.toString(16).padStart(2, '0'))
-      .join('');
-  return '0x' + hex;
+function isValidBytes(str) {
+  const encoder = new TextEncoder();
+  const bytes = encoder.encode(str);
+  //console.log(bytes.length);
+  return bytes.length === 40;
 }
+
+// https://web3js.readthedocs.io/en/v1.2.0/web3-utils.html?highlight=isValidAddress#isaddress
+function isValidAddress(address) {
+  try {
+    console.log("Validating Address: " + address);
+    let isAddress = web3.utils.isAddress(address);
+    if (!isAddress) {
+      return false;
+    }
+  } catch (e) {
+    console.log(e);
+    return false;
+  }
+  return true;
+}
+
+// Expect NodeID-ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567
+function isValidNodeId(nodes) {
+  console.log("Validating Node Id: " + nodes);
+
+    if (!nodes) { return false; }
+
+    //console.log(isValidBytes(nodes));
+
+     if(isValidBytes(nodes)) {
+      return true
+     };
+        
+    return false;
+  }
+
+
 
 async function sendFormattedJSON() {
   try {
@@ -232,7 +285,7 @@ function updateSubmitButtonState() {
   if (isJSONValid(minifiedOutput.value)) {
     submitButton.disabled = false;
     submitButton.classList.remove('btn-danger'); // Remove red color
-    $('#submitButton')[0].innerText = 'Submit/Register'
+    $('#submitButton')[0].innerText = 'Step 2: Submit/Register'
   } else {
     submitButton.disabled = true;
     submitButton.classList.add('btn-danger'); // Add red color

@@ -86,11 +86,10 @@
     );
   </script>
   <div class="container-fluid">
-    <h1 style="padding-top:2vw;">FTSO Registry Tool</h1>
-    <h3>Placeholder Subtitle</h3>
+    <h1 style="padding:2vw;">FTSO Registry Tool</h1>
     <br>
     <div class="input-section">
-        <h3>Step 1</h3>
+        <h3>Step 1: Enter Provider Details</h3>
         <div style="padding-top: 10px;">
             <label for="address">Address:</label>
             <input type="text" id="address" data-toggle="popover" title="Example" data-trigger="focus" data-content="0x1230000456" data-placement="right" data-offset="0%,2%">
@@ -112,15 +111,15 @@
             <input type="text" id="logourl" data-toggle="popover" title="Example" data-trigger="focus" data-content="https://mywebsite.com/logo.png" data-placement="right" data-offset="0%,2%"><br>
         </div>
         <div style="padding-top: 10px;">
-            <button class="btn btn-primary" onclick="minifyJSON()">Format</button>
+            <button class="btn btn-primary" onclick="minifyJSON()">Step 1: Format</button>
         </div>
     </div>
     <div class="output-section" style="width:100%;padding-top: 30px;align-items:center;">
-      <h3 style="width: 60%">Step 2</h3>
+      <h3 style="width: 60%">Step 2: Submit</h3>
       <label style="width: 60%" for="minifiedOutput" >Input:</label>
       <textarea id="minifiedOutput" style="width:60%;height:150px" readonly></textarea>
       <div class="buttonRow">
-        <button class="btn btn-primary" id="submitButton" onclick="sendFormattedJSON()" style="width: auto;">Submit/Register</button>
+        <button class="btn btn-primary" id="submitButton" onclick="sendFormattedJSON()" style="width: auto;">Step 2: Submit/Register</button>
         <button class="btn btn-secondary" onclick="copyToClipboard()" style="width: auto;">Copy to Clipboard</button>
         <button class="btn btn-secondary" onclick="window.open(openContract())" style="width: auto;">Open Contract</button>
         <button class="btn btn-secondary" onclick="getAllProviderInformation()" style="width: auto;">Test Call</button>
