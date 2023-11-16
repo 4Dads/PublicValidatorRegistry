@@ -43,6 +43,7 @@ function minifyJSON() {
     const nodeID = document.getElementById('nodeID').value.replace(/\s/g, "").split(','); //todo: verify byte20, length = 40
     const url = encodeURIComponent(document.getElementById('url').value.replace(/"/g,'&quot;').replace(/'/g,'&#39;'));
     const logourl = encodeURIComponent(document.getElementById('logourl').value.replace(/"/g,'&quot;').replace(/'/g,'&#39;'));
+    const submitButton = document.getElementById('submitButton');
   
     let data = {
       address: address,
@@ -56,12 +57,18 @@ function minifyJSON() {
     document.getElementById('minifiedOutput').value = jsonString;
 
     if (!isValidAddress(address)) {
+      submitButton.disabled = true;
+      submitButton.classList.add('btn-danger');
+      $('#submitButton')[0].innerText = 'Invalid Address';
       throw new Error('Invalid address');
     }
     //console.log(nodeID);
 
     for(var items in nodeID) {
       if (!isValidNodeId(nodeID[items])) {
+        submitButton.disabled = true;
+        submitButton.classList.add('btn-danger');
+        $('#submitButton')[0].innerText = 'Invalid NodeID';
         throw new Error('Invalid NodeID');
       }
     } 
@@ -140,7 +147,7 @@ function openContract() {
 function isValidBytes(str) {
   const encoder = new TextEncoder();
   const bytes = encoder.encode(str);
-  console.log(bytes.length);
+  //console.log(bytes.length);
   return bytes.length === 40;
 }
 
