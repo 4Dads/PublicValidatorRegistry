@@ -38,7 +38,7 @@ const contractABI = [
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
 function minifyJSON() {
-    const address = encodeURIComponent(document.getElementById('address').value.replace(/"/g,'&quot;').replace(/'/g,'&#39;'));
+    const address = document.getElementById('address').value.replace(/\s/g, "").replace(/"/g,'&quot;').replace(/'/g,'&#39;');
     const name = encodeURIComponent(document.getElementById('name').value.replace(/"/g,'&quot;').replace(/'/g,'&#39;'));
     const nodeID = document.getElementById('nodeID').value.replace(/\s/g, "").split(','); //todo: verify byte20, length = 40
     const url = encodeURIComponent(document.getElementById('url').value.replace(/"/g,'&quot;').replace(/'/g,'&#39;'));
@@ -64,6 +64,7 @@ function minifyJSON() {
     }
     //console.log(nodeID);
 
+    if(nodeID[0]) {
     for(var items in nodeID) {
       if (!isValidNodeId(nodeID[items])) {
         submitButton.disabled = true;
@@ -72,6 +73,7 @@ function minifyJSON() {
         throw new Error('Invalid NodeID');
       }
     } 
+  }
 
     updateSubmitButtonState();
   }
@@ -196,9 +198,9 @@ async function sendFormattedJSON() {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     const senderAddress = accounts[0];
 
-    const address = document.getElementById('address').value;
+    const address = document.getElementById('address').value.replace(/\s/g, "");
     const name = document.getElementById('name').value;
-    const nodeID = document.getElementById('nodeID').value.split(',');
+    const nodeID = document.getElementById('nodeID').value.replace(/\s/g, "").split(',');
     const url = document.getElementById('url').value;
     const logourl = document.getElementById('logourl').value;
 
